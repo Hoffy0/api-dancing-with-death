@@ -37,3 +37,4 @@ lerna-debug.log*
 ###
 db.const.ts
 .env
+ca-certificate.crt
