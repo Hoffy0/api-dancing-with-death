@@ -3,8 +3,6 @@ import { Controller, Get, Post, Put, Delete, Res, Body, Param, HttpStatus, NotFo
 import { CreateAppointmentDTO } from "./DTO/appointment.dto";
 
 import { AppointmentService } from './appointment.service';
-import { getegid } from 'process';
-import { throws } from 'assert/strict';
 
 @Controller('appointment')
 export class AppointmentController {
