@@ -12,10 +12,7 @@ import { readFileSync } from 'fs';
   imports: [
     ConfigModule.forRoot(),
     AppointmentModule,
-    MongooseModule.forRoot(process.env.MONGO_URI, {
-      tls: true,
-      tlsCAFile: 'ca-certificate.crt'
-    }),
+    MongooseModule.forRoot(process.env.MONGO_URI),
   ],
   controllers: [
     AppController
