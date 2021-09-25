@@ -14,17 +14,55 @@ export class AppointmentController {
     /***************** CREATE *****************/
     @Post('/add')
     async addAppointment(@Res() res, @Body() createAppointmentDTO: CreateAppointmentDTO ){
+        let currentDate = new Date()
+        currentDate.setHours(currentDate.getHours() - 3);
+        let currentYear = currentDate.getFullYear();
+        let currentMonth = currentDate.getMonth();
+        let currentDay = currentDate.getDate();
+        // console.log(this.currentYear)
+        // console.log(new Date(createAppointmentDTO.startAppointment).getFullYear() == this.currentYear)
+        let startAppointment = new Date(createAppointmentDTO.startAppointment).getHours();
+        let endAppointment   = new Date(createAppointmentDTO.endAppointment).getHours();
         try {
-            console.log(createAppointmentDTO);
-            const appointment =  await this.appointmentService.addAppointment(createAppointmentDTO)
-            return res.status(HttpStatus.OK).json({
-            message: 'Appointment scheduled',
-            appointment: appointment
-        });
+            if((new Date(createAppointmentDTO.startAppointment).getFullYear() == currentYear) && 
+                (new Date(createAppointmentDTO.startAppointment).getMonth() >= currentMonth)  &&
+                    (new Date(createAppointmentDTO.startAppointment).getDate() >= currentDay) ){
+                
+                        if((endAppointment - startAppointment) == 1){
+                            const appointment =  await this.appointmentService.addAppointment(createAppointmentDTO)
+                            return res.status(HttpStatus.OK).json({
+                                message: 'Appointment scheduled',
+                                appointment
+                            });
+                        }else{
+                            throw new Error('Date is invalid: the difference between startAppointment and endAppointment must be 1 hour').message;
+                        }
+            }else{
+                throw new Error('Date is invalid: must be greater than current date').message;
+            };
+            // if((new Date(createAppointmentDTO.startAppointment).getFullYear() == currentYear)){
+            //     if((new Date(createAppointmentDTO.startAppointment).getMonth() >= currentMonth)){
+            //         if((new Date(createAppointmentDTO.startAppointment).getDate() >= currentDay)){
+            //             if((endAppointment - startAppointment) == 1){
+            //                 const appointment =  await this.appointmentService.addAppointment(createAppointmentDTO)
+            //                 return res.status(HttpStatus.OK).json({
+            //                     message: 'Appointment scheduled',
+            //                     appointment
+            //                 });
+            //             }
+            //         }else{
+            //             throw new Error('Date is invalid: must be greater than current date').message;
+            //         }
+            //     }else{
+            //         throw new Error('Date is invalid: must be greater than current date').message;
+            //     }
+            // }else{
+            //     throw new Error('Date is invalid: must be greater than current date').message;
+            // };
         } catch (err) {
             console.error(err)
             return res.status(HttpStatus.NOT_ACCEPTABLE).json({
-                message: "Invalid type of date",
+                message: "Invalid format of date",
                 Error: err
             });
         }
