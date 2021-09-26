@@ -28,6 +28,7 @@
     "@nestjs/platform-express": "^8.0.0",
     "@types/mongoose": "^5.11.97",
     "dotenv": "^10.0.0",
+    "moment": "^2.29.1",
     "mongoose": "^5.13.9",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",
