@@ -18,42 +18,27 @@ export class AppointmentController {
         currentDate.setHours(currentDate.getHours() - 3);
         // console.log(this.currentYear)
         // console.log(new Date(createAppointmentDTO.startAppointment).getFullYear() == this.currentYear)
-        let startAppointment = new Date(createAppointmentDTO.startAppointment).getHours();
-        let endAppointment   = new Date(createAppointmentDTO.endAppointment).getHours();
+        let startAppointment = new Date(createAppointmentDTO.startAppointment).getHours() + 3; //Se suma mas 3 por la diferencia horaria
+        let endAppointment   = new Date(createAppointmentDTO.endAppointment).getHours() + 3;
 
         try {
             if(new Date(createAppointmentDTO.startAppointment) >= currentDate){   
-                        if((endAppointment - startAppointment) == 1){
-                            const appointment =  await this.appointmentService.addAppointment(createAppointmentDTO)
-                            return res.status(HttpStatus.OK).json({
-                                message: 'Appointment scheduled',
-                                appointment
-                            });
-                        }else{
-                            throw new Error('Date is invalid: the difference between startAppointment and endAppointment must be 1 hour').message;
-                        }
+                if((endAppointment - startAppointment) == 1){
+                    if(startAppointment >= 9 && startAppointment <= 18){
+                        const appointment =  await this.appointmentService.addAppointment(createAppointmentDTO)
+                        return res.status(HttpStatus.OK).json({
+                            message: 'Appointment scheduled',
+                            appointment
+                    });
+                    }else{
+                        throw new Error('Date is invalid: The hours must be between 9 a.m. and 6 p.m.').message;
+                    }
+                }else{
+                    throw new Error('Date is invalid: the difference between startAppointment and endAppointment must be 1 hour').message;
+                }
             }else{
                 throw new Error('Date is invalid: must be greater than current date').message;
             };
-            // if((new Date(createAppointmentDTO.startAppointment).getFullYear() == currentYear)){
-            //     if((new Date(createAppointmentDTO.startAppointment).getMonth() >= currentMonth)){
-            //         if((new Date(createAppointmentDTO.startAppointment).getDate() >= currentDay)){
-            //             if((endAppointment - startAppointment) == 1){
-            //                 const appointment =  await this.appointmentService.addAppointment(createAppointmentDTO)
-            //                 return res.status(HttpStatus.OK).json({
-            //                     message: 'Appointment scheduled',
-            //                     appointment
-            //                 });
-            //             }
-            //         }else{
-            //             throw new Error('Date is invalid: must be greater than current date').message;
-            //         }
-            //     }else{
-            //         throw new Error('Date is invalid: must be greater than current date').message;
-            //     }
-            // }else{
-            //     throw new Error('Date is invalid: must be greater than current date').message;
-            // };
         } catch (err) {
             console.error(err)
             return res.status(HttpStatus.NOT_ACCEPTABLE).json({
@@ -75,7 +60,7 @@ export class AppointmentController {
         } catch (err) {
             return res.status(HttpStatus.NOT_FOUND).json({
                 message: "Appointment not found",
-                err
+                Error: err
             });
         }
     }
@@ -129,7 +114,7 @@ export class AppointmentController {
             console.error(err)
             return res.status(HttpStatus.NOT_FOUND).json({
                 message: "Appointment not found",
-                err
+                Error: err
             });
         }
     }
