@@ -39,4 +39,18 @@ export class AppointmentService {
         return await this._appointmentModel.findByIdAndDelete(uid);
     }
 
+    /**************************************************************************/
+    async verifyIfApointmentExist(appointmentDate: Date){
+        const appointFound = await this. _appointmentModel.find({
+            startAppointment: appointmentDate
+        });
+
+        if(appointFound.length >= 1){
+            return true;
+        }else{
+            return false;
+        }
+
+    }
+
 }

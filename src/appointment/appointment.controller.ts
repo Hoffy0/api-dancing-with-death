@@ -3,6 +3,7 @@ import { Controller, Get, Post, Put, Delete, Res, Body, Param, HttpStatus, NotFo
 import { CreateAppointmentDTO } from "./DTO/appointment.dto";
 
 import { AppointmentService } from './appointment.service';
+import { startSession } from 'mongoose';
 
 @Controller('appointment')
 export class AppointmentController {
@@ -21,24 +22,31 @@ export class AppointmentController {
         let startAppointment = new Date(createAppointmentDTO.startAppointment).getHours() + 3; //Se suma mas 3 por la diferencia horaria
         let endAppointment   = new Date(createAppointmentDTO.endAppointment).getHours() + 3;
 
+        const exist = await this.appointmentService.verifyIfApointmentExist(new Date(createAppointmentDTO.startAppointment))
+
         try {
-            if(new Date(createAppointmentDTO.startAppointment) >= currentDate){   
-                if((endAppointment - startAppointment) == 1){
-                    if(startAppointment >= 9 && startAppointment <= 18){
-                        const appointment =  await this.appointmentService.addAppointment(createAppointmentDTO)
-                        return res.status(HttpStatus.OK).json({
-                            message: 'Appointment scheduled',
-                            appointment
-                    });
+            console.log(exist)
+            if(!exist){
+                if(new Date(createAppointmentDTO.startAppointment) >= currentDate){   
+                    if((endAppointment - startAppointment) == 1){
+                        if(startAppointment >= 9 && startAppointment <= 18){
+                            const appointment =  await this.appointmentService.addAppointment(createAppointmentDTO)
+                            return res.status(HttpStatus.OK).json({
+                                message: 'Appointment scheduled',
+                                appointment
+                        });
+                        }else{
+                            throw new Error('Date is invalid: The hours must be between 9 a.m. and 6 p.m.').message;
+                        }
                     }else{
-                        throw new Error('Date is invalid: The hours must be between 9 a.m. and 6 p.m.').message;
+                        throw new Error('Date is invalid: the difference between startAppointment and endAppointment must be 1 hour').message;
                     }
                 }else{
-                    throw new Error('Date is invalid: the difference between startAppointment and endAppointment must be 1 hour').message;
-                }
+                    throw new Error('Date is invalid: must be greater than current date').message;
+                };
             }else{
-                throw new Error('Date is invalid: must be greater than current date').message;
-            };
+                throw new Error('Date is invalid: this appointment already exist').message;
+            }
         } catch (err) {
             console.error(err)
             return res.status(HttpStatus.NOT_ACCEPTABLE).json({
